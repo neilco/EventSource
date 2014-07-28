@@ -7,15 +7,19 @@
 //
 
 #import "EventSource.h"
+#import <CoreGraphics/CGBase.h>
 
-#define ES_RECONNECT_TIMEOUT 1.0
+static CGFloat const ES_RECONNECT_TIMEOUT = 1.0;
+static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
 
 @interface EventSource () <NSURLConnectionDelegate, NSURLConnectionDataDelegate> {
-    NSURL *eventURL;
-    NSURLConnection *eventSource;
-    NSMutableDictionary *listeners;
     BOOL wasClosed;
 }
+
+@property (nonatomic, strong) NSURL *eventURL;
+@property (nonatomic, strong) NSURLConnection *eventSource;
+@property (nonatomic, strong) NSMutableDictionary *listeners;
+@property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
 - (void)open;
 
@@ -28,11 +32,23 @@
     return [[EventSource alloc] initWithURL:URL];
 }
 
++ (id)eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
+{
+    return [[EventSource alloc] initWithURL:URL timeoutInterval:timeoutInterval];
+}
+
 - (id)initWithURL:(NSURL *)URL
 {
-    if (self = [super init]) {
-        listeners = [NSMutableDictionary dictionary];
-        eventURL = URL;
+    return [self initWithURL:URL timeoutInterval:ES_DEFAULT_TIMEOUT];
+}
+
+- (id)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
+{
+    self = [super init];
+    if (self) {
+        _listeners = [NSMutableDictionary dictionary];
+        _eventURL = URL;
+        _timeoutInterval = timeoutInterval;
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ES_RECONNECT_TIMEOUT * NSEC_PER_SEC));
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
@@ -44,11 +60,11 @@
 
 - (void)addEventListener:(NSString *)eventName handler:(EventSourceEventHandler)handler
 {
-    if (listeners[eventName] == nil) {
-        [listeners setObject:[NSMutableArray array] forKey:eventName];
+    if (self.listeners[eventName] == nil) {
+        [self.listeners setObject:[NSMutableArray array] forKey:eventName];
     }
     
-    [listeners[eventName] addObject:handler];
+    [self.listeners[eventName] addObject:handler];
 }
 
 - (void)onMessage:(EventSourceEventHandler)handler
@@ -69,14 +85,14 @@
 - (void)open
 {
     wasClosed = NO;
-    NSURLRequest *request = [NSURLRequest requestWithURL:eventURL];
-    eventSource = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    NSURLRequest *request = [NSURLRequest requestWithURL:self.eventURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:self.timeoutInterval];
+    self.eventSource = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
 
 - (void)close
 {
     wasClosed = YES;
-    [eventSource cancel];
+    [self.eventSource cancel];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -89,7 +105,7 @@
         Event *e = [Event new];
         e.readyState = kEventStateOpen;
         
-        NSArray *openHandlers = listeners[OpenEvent];
+        NSArray *openHandlers = self.listeners[OpenEvent];
         for (EventSourceEventHandler handler in openHandlers) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 handler(e);
@@ -104,7 +120,7 @@
     e.readyState = kEventStateClosed;
     e.error = error;
     
-    NSArray *errorHandlers = listeners[ErrorEvent];
+    NSArray *errorHandlers = self.listeners[ErrorEvent];
     for (EventSourceEventHandler handler in errorHandlers) {
         dispatch_async(dispatch_get_main_queue(), ^{
             handler(e);
@@ -140,7 +156,7 @@
                 }
             }
             
-            NSArray *messageHandlers = listeners[MessageEvent];
+            NSArray *messageHandlers = self.listeners[MessageEvent];
             for (EventSourceEventHandler handler in messageHandlers) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     handler(e);
@@ -148,7 +164,7 @@
             }
             
             if (e.event != nil) {
-                NSArray *namedEventhandlers = listeners[e.event];
+                NSArray *namedEventhandlers = self.listeners[e.event];
                 for (EventSourceEventHandler handler in namedEventhandlers) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         handler(e);
@@ -171,7 +187,7 @@
                                   code:e.readyState
                               userInfo:@{ NSLocalizedDescriptionKey: @"Connection with the event source was closed." }];
     
-    NSArray *errorHandlers = listeners[ErrorEvent];
+    NSArray *errorHandlers = self.listeners[ErrorEvent];
     for (EventSourceEventHandler handler in errorHandlers) {
         dispatch_async(dispatch_get_main_queue(), ^{
             handler(e);
