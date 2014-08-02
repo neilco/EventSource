@@ -9,7 +9,7 @@
 #import "EventSource.h"
 #import <CoreGraphics/CGBase.h>
 
-static CGFloat const ES_RECONNECT_TIMEOUT = 1.0;
+static CGFloat const ES_RETRY_INTERVAL = 1.0;
 static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
 
 @interface EventSource () <NSURLConnectionDelegate, NSURLConnectionDataDelegate> {
@@ -20,6 +20,7 @@ static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
 @property (nonatomic, strong) NSURLConnection *eventSource;
 @property (nonatomic, strong) NSMutableDictionary *listeners;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
+@property (nonatomic, assign) NSTimeInterval retryInterval;
 
 - (void)open;
 
@@ -49,8 +50,9 @@ static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
         _listeners = [NSMutableDictionary dictionary];
         _eventURL = URL;
         _timeoutInterval = timeoutInterval;
+        _retryInterval = ES_RETRY_INTERVAL;
         
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ES_RECONNECT_TIMEOUT * NSEC_PER_SEC));
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_retryInterval * NSEC_PER_SEC));
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
             [self open];
         });
@@ -127,7 +129,7 @@ static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
         });
     }
     
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ES_RECONNECT_TIMEOUT * NSEC_PER_SEC));
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.retryInterval * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [self open];
     });
@@ -153,6 +155,8 @@ static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
                     e.event = pairs[1];
                 } else if ([component hasPrefix:@"data"]) {
                     e.data = pairs[1];
+                } else if ([component hasPrefix:@"retry"]) {
+                    self.retryInterval = [pairs[1] doubleValue];
                 }
             }
             
