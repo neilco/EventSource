@@ -21,6 +21,7 @@ static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
 @property (nonatomic, strong) NSMutableDictionary *listeners;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 @property (nonatomic, assign) NSTimeInterval retryInterval;
+@property (nonatomic, strong) id lastEventID;
 
 - (void)open;
 
@@ -87,7 +88,10 @@ static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
 - (void)open
 {
     wasClosed = NO;
-    NSURLRequest *request = [NSURLRequest requestWithURL:self.eventURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:self.timeoutInterval];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.eventURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:self.timeoutInterval];
+    if (self.lastEventID) {
+        [request setValue:self.lastEventID forHTTPHeaderField:@"Last-Event-ID"];
+    }
     self.eventSource = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
 
@@ -151,6 +155,7 @@ static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
                 NSArray *pairs = [component componentsSeparatedByString:@": "];
                 if ([component hasPrefix:@"id"]) {
                     e.id = pairs[1];
+                    self.lastEventID = e.id;
                 } else if ([component hasPrefix:@"event"]) {
                     e.event = pairs[1];
                 } else if ([component hasPrefix:@"data"]) {
