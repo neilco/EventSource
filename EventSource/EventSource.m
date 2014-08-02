@@ -12,6 +12,15 @@
 static CGFloat const ES_RETRY_INTERVAL = 1.0;
 static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
 
+static NSString *const ESKeyValueDelimiter = @": ";
+static NSString *const ESEventSeparator = @"\n\n";
+static NSString *const ESEventKeyValuePairSeparator = @"\n";
+
+static NSString *const ESEventDataKey = @"data";
+static NSString *const ESEventIDKey = @"id";
+static NSString *const ESEventEventKey = @"event";
+static NSString *const ESEventRetryKey = @"retry";
+
 @interface EventSource () <NSURLConnectionDelegate, NSURLConnectionDataDelegate> {
     BOOL wasClosed;
 }
@@ -143,25 +152,36 @@ static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
 {
     __block NSString *eventString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
-    if ([eventString hasSuffix:@"\n\n"]) {
+    if ([eventString hasSuffix:ESEventSeparator]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            eventString = [eventString stringByReplacingOccurrencesOfString:@"\n\n" withString:@""];
-            NSMutableArray *components = [[eventString componentsSeparatedByString:@"\n"] mutableCopy];
+            eventString = [eventString stringByReplacingOccurrencesOfString:ESEventSeparator withString:@""];
+            NSMutableArray *components = [[eventString componentsSeparatedByString:ESEventKeyValuePairSeparator] mutableCopy];
             
             Event *e = [Event new];
             e.readyState = kEventStateOpen;
             
             for (NSString *component in components) {
-                NSArray *pairs = [component componentsSeparatedByString:@": "];
-                if ([component hasPrefix:@"id"]) {
-                    e.id = pairs[1];
+                if (component.length == 0) {
+                    continue;
+                }
+                
+                NSInteger index = [component rangeOfString:ESKeyValueDelimiter].location;
+                if (index == NSNotFound || index == (component.length - 2)) {
+                    continue;
+                }
+                
+                NSString *key = [component substringToIndex:index];
+                NSString *value = [component substringFromIndex:index + ESKeyValueDelimiter.length];
+                
+                if ([key isEqualToString:ESEventIDKey]) {
+                    e.id = value;
                     self.lastEventID = e.id;
-                } else if ([component hasPrefix:@"event"]) {
-                    e.event = pairs[1];
-                } else if ([component hasPrefix:@"data"]) {
-                    e.data = pairs[1];
-                } else if ([component hasPrefix:@"retry"]) {
-                    self.retryInterval = [pairs[1] doubleValue];
+                } else if ([key isEqualToString:ESEventEventKey]) {
+                    e.event = value;
+                } else if ([key isEqualToString:ESEventDataKey]) {
+                    e.data = value;
+                } else if ([key isEqualToString:ESEventRetryKey]) {
+                    self.retryInterval = [value doubleValue];
                 }
             }
             
