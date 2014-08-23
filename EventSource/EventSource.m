@@ -13,7 +13,9 @@ static CGFloat const ES_RETRY_INTERVAL = 1.0;
 static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
 
 static NSString *const ESKeyValueDelimiter = @": ";
-static NSString *const ESEventSeparator = @"\n\n";
+static NSString *const ESEventSeparatorLFLF = @"\n\n";
+static NSString *const ESEventSeparatorCRCR = @"\r\r";
+static NSString *const ESEventSeparatorCRLFCRLF = @"\r\n\r\n";
 static NSString *const ESEventKeyValuePairSeparator = @"\n";
 
 static NSString *const ESEventDataKey = @"data";
@@ -152,9 +154,11 @@ static NSString *const ESEventRetryKey = @"retry";
 {
     __block NSString *eventString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
-    if ([eventString hasSuffix:ESEventSeparator]) {
+    if ([eventString hasSuffix:ESEventSeparatorLFLF] ||
+        [eventString hasSuffix:ESEventSeparatorCRCR] ||
+        [eventString hasSuffix:ESEventSeparatorCRLFCRLF]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            eventString = [eventString stringByReplacingOccurrencesOfString:ESEventSeparator withString:@""];
+            eventString = [eventString stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
             NSMutableArray *components = [[eventString componentsSeparatedByString:ESEventKeyValuePairSeparator] mutableCopy];
             
             Event *e = [Event new];
