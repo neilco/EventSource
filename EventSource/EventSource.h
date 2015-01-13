@@ -88,6 +88,7 @@ typedef void (^EventSourceEventHandler)(Event *event);
 /// @param eventName The name of the event you registered.
 /// @param handler The handler for the Message event.
 - (void)addEventListener:(NSString *)eventName handler:(EventSourceEventHandler)handler;
+- (void)removeEventListener:(NSString *)eventName handler:(EventSourceEventHandler)handler;
 
 /// Closes the connection to the EventSource.
 - (void)close;

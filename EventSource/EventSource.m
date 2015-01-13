@@ -93,6 +93,13 @@ static NSString *const ESEventRetryKey = @"retry";
     [self.listeners[eventName] addObject:handler];
 }
 
+- (void)removeEventListener:(NSString *)eventName handler:(EventSourceEventHandler)handler
+{
+    if (self.listeners[eventName])
+        [self.listeners[eventName] removeObject:handler];
+}
+
+
 - (void)onMessage:(EventSourceEventHandler)handler
 {
     [self addEventListener:MessageEvent handler:handler];
