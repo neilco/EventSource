@@ -40,22 +40,22 @@ static NSString *const ESEventRetryKey = @"retry";
 
 @implementation EventSource
 
-+ (id)eventSourceWithURL:(NSURL *)URL
++ (instancetype)eventSourceWithURL:(NSURL *)URL
 {
     return [[EventSource alloc] initWithURL:URL];
 }
 
-+ (id)eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
++ (instancetype)eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
 {
     return [[EventSource alloc] initWithURL:URL timeoutInterval:timeoutInterval];
 }
 
-- (id)initWithURL:(NSURL *)URL
+- (instancetype)initWithURL:(NSURL *)URL
 {
     return [self initWithURL:URL timeoutInterval:ES_DEFAULT_TIMEOUT];
 }
 
-- (id)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
+- (instancetype)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
 {
     self = [super init];
     if (self) {
