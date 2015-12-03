@@ -64,6 +64,9 @@ typedef void (^EventSourceEventHandler)(Event *event);
 /// @param timeoutInterval The request timeout interval in seconds. See <tt>NSURLRequest</tt> for more details. Default: 5 minutes.
 - (instancetype)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval;
 
+/// Means reconnection on connection termination.
+@property (nonatomic, assign) BOOL shouldReconnect;
+
 /// Registers an event handler for the Message event.
 ///
 /// @param handler The handler for the Message event.

@@ -65,6 +65,7 @@ static NSString *const ESEventRetryKey = @"retry";
         _timeoutInterval = timeoutInterval;
         _retryInterval = ES_RETRY_INTERVAL;
         _buffer = [NSMutableData data];
+        _shouldReconnect = YES;
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_retryInterval * NSEC_PER_SEC));
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
@@ -209,7 +210,8 @@ static NSString *const ESEventRetryKey = @"retry";
             }
         }
         
-        [self.buffer replaceBytesInRange:NSMakeRange(0, range.location + range.length) withBytes:NULL length:0];
+        NSInteger eventStringLength = [[bufferString substringToIndex:range.location + range.length] dataUsingEncoding:NSUTF8StringEncoding].length;
+        [self.buffer replaceBytesInRange:NSMakeRange(0, eventStringLength) withBytes:NULL length:0];
         [self connection:connection didReceiveData:[NSData data]];
     }
 }
@@ -233,7 +235,9 @@ static NSString *const ESEventRetryKey = @"retry";
         });
     }
     
-    [self open];
+    if (self.shouldReconnect) {
+        [self open];
+    }
 }
 
 @end
