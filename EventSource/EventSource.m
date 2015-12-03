@@ -99,6 +99,11 @@ static NSString *const ESEventRetryKey = @"retry";
     [self addEventListener:OpenEvent handler:handler];
 }
 
+- (void)onClose:(EventSourceEventHandler)handler
+{
+    [self addEventListener:CloseEvent handler:handler];
+}
+
 - (void)open
 {
     wasClosed = NO;
@@ -218,24 +223,22 @@ static NSString *const ESEventRetryKey = @"retry";
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    if (wasClosed) {
-        return;
+    if (self.buffer.length > 0) {
+        // Process last message by adding message separartor to end
+        [self connection:connection didReceiveData:[ESEventSeparatorCRLFCRLF dataUsingEncoding:NSUTF8StringEncoding]];
     }
     
     Event *e = [Event new];
     e.readyState = kEventStateClosed;
-    e.error = [NSError errorWithDomain:@""
-                                  code:e.readyState
-                              userInfo:@{ NSLocalizedDescriptionKey: @"Connection with the event source was closed." }];
     
-    NSArray *errorHandlers = self.listeners[ErrorEvent];
+    NSArray *errorHandlers = self.listeners[CloseEvent];
     for (EventSourceEventHandler handler in errorHandlers) {
         dispatch_async(dispatch_get_main_queue(), ^{
             handler(e);
         });
     }
     
-    if (self.shouldReconnect) {
+    if (!wasClosed && self.shouldReconnect) {
         [self open];
     }
 }
@@ -274,3 +277,4 @@ static NSString *const ESEventRetryKey = @"retry";
 NSString *const MessageEvent = @"message";
 NSString *const ErrorEvent = @"error";
 NSString *const OpenEvent = @"open";
+NSString *const CloseEvent = @"close";

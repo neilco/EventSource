@@ -82,6 +82,11 @@ typedef void (^EventSourceEventHandler)(Event *event);
 /// @param handler The handler for the Open event.
 - (void)onOpen:(EventSourceEventHandler)handler;
 
+/// Registers an event handler for the Close event.
+///
+/// @param handler The handler for the Close event.
+- (void)onClose:(EventSourceEventHandler)handler;
+
 /// Registers an event handler for a named event.
 ///
 /// @param eventName The name of the event you registered.
@@ -98,3 +103,4 @@ typedef void (^EventSourceEventHandler)(Event *event);
 extern NSString *const MessageEvent;
 extern NSString *const ErrorEvent;
 extern NSString *const OpenEvent;
+extern NSString *const CloseEvent;
