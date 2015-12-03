@@ -240,6 +240,8 @@ static NSString *const ESEventRetryKey = @"retry";
     
     if (!wasClosed && self.shouldReconnect) {
         [self open];
+    } else {
+        self.eventSource = nil;
     }
 }
 
