@@ -133,6 +133,10 @@ static NSString *const ESEventRetryKey = @"retry";
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
+    if (wasClosed) {
+        return;
+    }
+    
     Event *e = [Event new];
     e.readyState = kEventStateClosed;
     e.error = error;
