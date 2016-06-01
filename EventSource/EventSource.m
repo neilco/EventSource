@@ -33,6 +33,7 @@ static NSString *const ESEventRetryKey = @"retry";
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 @property (nonatomic, assign) NSTimeInterval retryInterval;
 @property (nonatomic, strong) id lastEventID;
+@property (nonatomic, strong) dispatch_queue_t queue;
 
 - (void)open;
 
@@ -40,22 +41,32 @@ static NSString *const ESEventRetryKey = @"retry";
 
 @implementation EventSource
 
-+ (id)eventSourceWithURL:(NSURL *)URL
++ (instancetype)eventSourceWithURL:(NSURL *)URL
 {
     return [[EventSource alloc] initWithURL:URL];
 }
 
-+ (id)eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
++ (instancetype)eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
 {
     return [[EventSource alloc] initWithURL:URL timeoutInterval:timeoutInterval];
 }
 
-- (id)initWithURL:(NSURL *)URL
++ (instancetype)eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval queue:(dispatch_queue_t)queue
+{
+    return [[EventSource alloc] initWithURL:URL timeoutInterval:timeoutInterval queue:queue];
+}
+
+- (instancetype)initWithURL:(NSURL *)URL
 {
     return [self initWithURL:URL timeoutInterval:ES_DEFAULT_TIMEOUT];
 }
 
-- (id)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
+- (instancetype)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
+{
+    return [self initWithURL:URL timeoutInterval:timeoutInterval queue:dispatch_get_main_queue()];
+}
+
+- (instancetype)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval queue:(dispatch_queue_t)queue
 {
     self = [super init];
     if (self) {
@@ -63,9 +74,10 @@ static NSString *const ESEventRetryKey = @"retry";
         _eventURL = URL;
         _timeoutInterval = timeoutInterval;
         _retryInterval = ES_RETRY_INTERVAL;
+        _queue = queue;
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_retryInterval * NSEC_PER_SEC));
-        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        dispatch_after(popTime, queue, ^(void){
             [self open];
         });
     }
@@ -80,6 +92,13 @@ static NSString *const ESEventRetryKey = @"retry";
     
     [self.listeners[eventName] addObject:handler];
 }
+
+- (void)removeEventListener:(NSString *)eventName handler:(EventSourceEventHandler)handler
+{
+    if (self.listeners[eventName])
+        [self.listeners[eventName] removeObject:handler];
+}
+
 
 - (void)onMessage:(EventSourceEventHandler)handler
 {
@@ -104,12 +123,17 @@ static NSString *const ESEventRetryKey = @"retry";
         [request setValue:self.lastEventID forHTTPHeaderField:@"Last-Event-ID"];
     }
     self.eventSource = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    
+    if (![NSThread isMainThread]) {
+        CFRunLoopRun();
+    }
 }
 
 - (void)close
 {
     wasClosed = YES;
     [self.eventSource cancel];
+    self.queue = nil;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -124,7 +148,7 @@ static NSString *const ESEventRetryKey = @"retry";
         
         NSArray *openHandlers = self.listeners[OpenEvent];
         for (EventSourceEventHandler handler in openHandlers) {
-            dispatch_async(dispatch_get_main_queue(), ^{
+            dispatch_async(self.queue, ^{
                 handler(e);
             });
         }
@@ -139,13 +163,13 @@ static NSString *const ESEventRetryKey = @"retry";
     
     NSArray *errorHandlers = self.listeners[ErrorEvent];
     for (EventSourceEventHandler handler in errorHandlers) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async(self.queue, ^{
             handler(e);
         });
     }
     
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.retryInterval * NSEC_PER_SEC));
-    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+    dispatch_after(popTime, self.queue, ^(void){
         [self open];
     });
 }
@@ -191,7 +215,7 @@ static NSString *const ESEventRetryKey = @"retry";
             
             NSArray *messageHandlers = self.listeners[MessageEvent];
             for (EventSourceEventHandler handler in messageHandlers) {
-                dispatch_async(dispatch_get_main_queue(), ^{
+                dispatch_async(self.queue, ^{
                     handler(e);
                 });
             }
@@ -199,7 +223,7 @@ static NSString *const ESEventRetryKey = @"retry";
             if (e.event != nil) {
                 NSArray *namedEventhandlers = self.listeners[e.event];
                 for (EventSourceEventHandler handler in namedEventhandlers) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
+                    dispatch_async(self.queue, ^{
                         handler(e);
                     });
                 }
@@ -222,7 +246,7 @@ static NSString *const ESEventRetryKey = @"retry";
     
     NSArray *errorHandlers = self.listeners[ErrorEvent];
     for (EventSourceEventHandler handler in errorHandlers) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async(self.queue, ^{
             handler(e);
         });
     }
