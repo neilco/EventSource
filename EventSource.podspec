@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 	s.name         = "EventSource"
-	s.version      = "1.0.1"
+	s.version      = "1.0.2"
 	s.summary      = "HTML5 Server-Sent Events in your Cocoa app."
 	s.homepage     = "http://github.com/neilco/EventSource"
 	s.license      = 'MIT (see LICENSE.txt)'
