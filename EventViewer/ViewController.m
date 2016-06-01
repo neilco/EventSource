@@ -16,6 +16,10 @@
     [super viewDidLoad];
     
     EventSource *source = [EventSource eventSourceWithURL:[NSURL URLWithString:@"http://127.0.0.1:8000/"]];
+    [source onReadyStateChanged:^(Event *event) {
+        NSLog(@"READYSTATE: %@", event);
+    }];
+
     [source addEventListener:@"hello_event" handler:^(Event *e) {
         NSLog(@"%@: %@", e.event, e.data);
     }];
