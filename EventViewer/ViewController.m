@@ -15,9 +15,14 @@
 {
     [super viewDidLoad];
     
-    EventSource *source = [EventSource eventSourceWithURL:[NSURL URLWithString:@"http://127.0.0.1:8000/"]];
-    [source addEventListener:@"hello_event" handler:^(Event *e) {
-        NSLog(@"%@: %@", e.event, e.data);
+    EventSource *sourceMainThread = [EventSource eventSourceWithURL:[NSURL URLWithString:@"http://127.0.0.1:8000/"]];
+    [sourceMainThread addEventListener:@"hello_event" handler:^(Event *e) {
+        NSLog(@"%@ -> %@: %@", [NSThread isMainThread] ? @"Main Thread" : @"Background Thread", e.event, e.data);
+    }];
+    
+    EventSource *sourceBackgroundThread = [EventSource eventSourceWithURL:[NSURL URLWithString:@"http://127.0.0.1:8000/"] timeoutInterval:30 queue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)];
+    [sourceBackgroundThread addEventListener:@"hello_event" handler:^(Event *e) {
+        NSLog(@"%@ -> %@: %@", [NSThread isMainThread] ? @"Main Thread" : @"Background Thread", e.event, e.data);
     }];
 }
 
