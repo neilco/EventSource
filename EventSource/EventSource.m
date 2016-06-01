@@ -12,7 +12,7 @@
 static CGFloat const ES_RETRY_INTERVAL = 1.0;
 static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
 
-static NSString *const ESKeyValueDelimiter = @": ";
+static NSString *const ESKeyValueDelimiter = @":";
 static NSString *const ESEventSeparatorLFLF = @"\n\n";
 static NSString *const ESEventSeparatorCRCR = @"\r\r";
 static NSString *const ESEventSeparatorCRLFCRLF = @"\r\n\r\n";
@@ -33,6 +33,7 @@ static NSString *const ESEventRetryKey = @"retry";
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 @property (nonatomic, assign) NSTimeInterval retryInterval;
 @property (nonatomic, strong) id lastEventID;
+@property (nonatomic, strong) NSMutableData *buffer;
 
 - (void)open;
 
@@ -63,6 +64,8 @@ static NSString *const ESEventRetryKey = @"retry";
         _eventURL = URL;
         _timeoutInterval = timeoutInterval;
         _retryInterval = ES_RETRY_INTERVAL;
+        _buffer = [NSMutableData data];
+        _shouldReconnect = YES;
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_retryInterval * NSEC_PER_SEC));
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
@@ -94,6 +97,11 @@ static NSString *const ESEventRetryKey = @"retry";
 - (void)onOpen:(EventSourceEventHandler)handler
 {
     [self addEventListener:OpenEvent handler:handler];
+}
+
+- (void)onClose:(EventSourceEventHandler)handler
+{
+    [self addEventListener:CloseEvent handler:handler];
 }
 
 - (void)open
@@ -152,82 +160,89 @@ static NSString *const ESEventRetryKey = @"retry";
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    __block NSString *eventString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    [self.buffer appendData:data];
+    NSString *bufferString = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
     
-    if ([eventString hasSuffix:ESEventSeparatorLFLF] ||
-        [eventString hasSuffix:ESEventSeparatorCRCR] ||
-        [eventString hasSuffix:ESEventSeparatorCRLFCRLF]) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            eventString = [eventString stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-            NSMutableArray *components = [[eventString componentsSeparatedByString:ESEventKeyValuePairSeparator] mutableCopy];
-            
-            Event *e = [Event new];
-            e.readyState = kEventStateOpen;
-            
-            for (NSString *component in components) {
-                if (component.length == 0) {
-                    continue;
-                }
-                
-                NSInteger index = [component rangeOfString:ESKeyValueDelimiter].location;
-                if (index == NSNotFound || index == (component.length - 2)) {
-                    continue;
-                }
-                
-                NSString *key = [component substringToIndex:index];
-                NSString *value = [component substringFromIndex:index + ESKeyValueDelimiter.length];
-                
-                if ([key isEqualToString:ESEventIDKey]) {
-                    e.id = value;
-                    self.lastEventID = e.id;
-                } else if ([key isEqualToString:ESEventEventKey]) {
-                    e.event = value;
-                } else if ([key isEqualToString:ESEventDataKey]) {
-                    e.data = value;
-                } else if ([key isEqualToString:ESEventRetryKey]) {
-                    self.retryInterval = [value doubleValue];
-                }
+    NSRange range;
+    if ((range = [bufferString rangeOfString:ESEventSeparatorLFLF]).location != NSNotFound ||
+        (range = [bufferString rangeOfString:ESEventSeparatorCRCR]).location != NSNotFound ||
+        (range = [bufferString rangeOfString:ESEventSeparatorCRLFCRLF]).location != NSNotFound) {
+        NSString *eventString = [bufferString substringToIndex:range.location];
+        eventString = [eventString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        
+        Event *e = [Event new];
+        e.readyState = kEventStateOpen;
+
+        NSArray *components = [eventString componentsSeparatedByString:ESEventKeyValuePairSeparator];
+        for (NSString *component in components) {
+            if (component.length == 0) {
+                continue;
             }
             
-            NSArray *messageHandlers = self.listeners[MessageEvent];
-            for (EventSourceEventHandler handler in messageHandlers) {
+            NSInteger index = [component rangeOfString:ESKeyValueDelimiter].location;
+            if (index == NSNotFound || index == (component.length - 2)) {
+                continue;
+            }
+            
+            NSString *key = [[component substringToIndex:index] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSString *value = [[component substringFromIndex:index + ESKeyValueDelimiter.length] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            
+            if ([key isEqualToString:ESEventIDKey]) {
+                e.id = value;
+                self.lastEventID = e.id;
+            } else if ([key isEqualToString:ESEventEventKey]) {
+                e.event = value;
+            } else if ([key isEqualToString:ESEventDataKey]) {
+                e.data = value;
+            } else if ([key isEqualToString:ESEventRetryKey]) {
+                self.retryInterval = [value doubleValue];
+            }
+        }
+        
+        NSArray *messageHandlers = self.listeners[MessageEvent];
+        for (EventSourceEventHandler handler in messageHandlers) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                handler(e);
+            });
+        }
+        
+        if (e.event != nil) {
+            NSArray *namedEventhandlers = self.listeners[e.event];
+            for (EventSourceEventHandler handler in namedEventhandlers) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     handler(e);
                 });
             }
-            
-            if (e.event != nil) {
-                NSArray *namedEventhandlers = self.listeners[e.event];
-                for (EventSourceEventHandler handler in namedEventhandlers) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        handler(e);
-                    });
-                }
-            }
-        });
+        }
+        
+        NSInteger eventStringLength = [[bufferString substringToIndex:range.location + range.length] dataUsingEncoding:NSUTF8StringEncoding].length;
+        [self.buffer replaceBytesInRange:NSMakeRange(0, eventStringLength) withBytes:NULL length:0];
+        [self connection:connection didReceiveData:[NSData data]];
     }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    if (wasClosed) {
-        return;
+    if (self.buffer.length > 0) {
+        // Process last message by adding message separartor to end
+        [self connection:connection didReceiveData:[ESEventSeparatorCRLFCRLF dataUsingEncoding:NSUTF8StringEncoding]];
     }
     
     Event *e = [Event new];
     e.readyState = kEventStateClosed;
-    e.error = [NSError errorWithDomain:@""
-                                  code:e.readyState
-                              userInfo:@{ NSLocalizedDescriptionKey: @"Connection with the event source was closed." }];
     
-    NSArray *errorHandlers = self.listeners[ErrorEvent];
+    NSArray *errorHandlers = self.listeners[CloseEvent];
     for (EventSourceEventHandler handler in errorHandlers) {
         dispatch_async(dispatch_get_main_queue(), ^{
             handler(e);
         });
     }
     
-    [self open];
+    if (!wasClosed && self.shouldReconnect) {
+        [self open];
+    } else {
+        self.eventSource = nil;
+    }
 }
 
 @end
@@ -264,3 +279,4 @@ static NSString *const ESEventRetryKey = @"retry";
 NSString *const MessageEvent = @"message";
 NSString *const ErrorEvent = @"error";
 NSString *const OpenEvent = @"open";
+NSString *const CloseEvent = @"close";
