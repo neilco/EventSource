@@ -1,6 +1,8 @@
 # EventSource
 **Server-Sent Events for iOS and Mac**
 
+![Travis](https://travis-ci.org/neilco/EventSource.svg?branch=master)
+
 ## What does it do?
 
 It creates a long-lived, unidirectional HTTP channel between your Cocoa app and a web server so that your app can receive events from the server. 
