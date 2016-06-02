@@ -7,11 +7,11 @@
 
 It creates a long-lived, unidirectional HTTP channel between your Cocoa app and a web server so that your app can receive events from the server. 
 
-### Client Code
+#### Listening for Named Events
 
 Subscribing to a _named event_ is done via the `addEventListener:handler:` method, as shown below:
 
-```
+```objc
 NSURL *serverURL = [NSURL URLWithString:@"http://127.0.0.1:8000/"];
 EventSource *source = [EventSource eventSourceWithURL:serverURL];
 [source addEventListener:@"hello_event" handler:^(Event *e) {
@@ -21,9 +21,35 @@ EventSource *source = [EventSource eventSourceWithURL:serverURL];
 
 It's super simple and will be familiar to anyone who has seen any Server-Sent Events JavaScript code.
 
-There's a `onMessage:` method that will receive all message events from the server. Additionally, there are `onOpen:` and `onError:` methods to receive open and error events. 
+#### Listening for All Events
 
-Re-connections to the server are automatic and graceful, even if the server goes go. 
+There's a `onMessage:` method that will receive all message events from the server. 
+
+```objc
+NSURL *serverURL = [NSURL URLWithString:@"http://127.0.0.1:8000/"];
+EventSource *source = [EventSource eventSourceWithURL:serverURL];
+[source onMessage:^(Event *e) {
+    NSLog(@"%@: %@", e.event, e.data);
+}];
+```
+
+#### Listening for Connection State Changes
+
+Additionally, there are `onOpen:`,  `onError:`, and `onReadyStateChanged:` methods to receive connection state events. 
+
+```objc
+NSURL *serverURL = [NSURL URLWithString:@"http://127.0.0.1:8000/"];
+EventSource *source = [EventSource eventSourceWithURL:serverURL];
+[source onError:^(Event *e) {
+    NSLog(@"ERROR: %@", e.data);
+}];
+```
+
+With the exception of the `onError:`, the `event` and `data` properties for these events will be `null`. Check the `readyState` property on the event. 
+
+#### Graceful Connection Handling
+
+Reconnection attempts are automatic and seamless, even if the server goes go. How frequently reconnection attempts are made is controlled by the server by setting the `retry` key on its events. 
 
 ### Server Code
 
