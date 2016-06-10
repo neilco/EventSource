@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "28291CBF1D0B2FC500B06A27"
-               BuildableName = "EventSource.framework"
-               BlueprintName = "EventSource-iOS"
+               BlueprintIdentifier = "28291CCE1D0B30DD00B06A27"
+               BuildableName = "EventSource-Mac.framework"
+               BlueprintName = "EventSource-Mac"
                ReferencedContainer = "container:EventSource.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "28291CBF1D0B2FC500B06A27"
-            BuildableName = "EventSource.framework"
-            BlueprintName = "EventSource-iOS"
+            BlueprintIdentifier = "28291CCE1D0B30DD00B06A27"
+            BuildableName = "EventSource-Mac.framework"
+            BlueprintName = "EventSource-Mac"
             ReferencedContainer = "container:EventSource.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -63,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "28291CBF1D0B2FC500B06A27"
-            BuildableName = "EventSource.framework"
-            BlueprintName = "EventSource-iOS"
+            BlueprintIdentifier = "28291CCE1D0B30DD00B06A27"
+            BuildableName = "EventSource-Mac.framework"
+            BlueprintName = "EventSource-Mac"
             ReferencedContainer = "container:EventSource.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
