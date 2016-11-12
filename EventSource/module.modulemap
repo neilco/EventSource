@@ -1,0 +1,6 @@
+framework module EventSource {
+    umbrella header "EventSource.h"
+    
+    export *
+    module * { export * }
+}

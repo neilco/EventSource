@@ -7,14 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		281714831DD735E400F7A8E0 /* EventSource.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28291CC01D0B2FC500B06A27 /* EventSource.framework */; };
+		281714841DD735E400F7A8E0 /* EventSource.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 28291CC01D0B2FC500B06A27 /* EventSource.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		281714881DD7362E00F7A8E0 /* EventSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838333317A1BFFE00C0141D /* EventSource.m */; };
+		281714891DD7363700F7A8E0 /* EventSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 2838333117A1BFFE00C0141D /* EventSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2817148A1DD736A200F7A8E0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2838333F17A1C02900C0141D /* UIKit.framework */; };
 		28291CC31D0B2FC500B06A27 /* EventSource-iOS.h in Headers */ = {isa = PBXBuildFile; fileRef = 28291CC21D0B2FC500B06A27 /* EventSource-iOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		28291CC81D0B2FE700B06A27 /* EventSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 2838333117A1BFFE00C0141D /* EventSource.h */; };
+		28291CC81D0B2FE700B06A27 /* EventSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 2838333117A1BFFE00C0141D /* EventSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		28291CC91D0B2FE700B06A27 /* EventSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838333317A1BFFE00C0141D /* EventSource.m */; };
 		28291CD21D0B30DD00B06A27 /* EventSource-Mac.h in Headers */ = {isa = PBXBuildFile; fileRef = 28291CD11D0B30DD00B06A27 /* EventSource-Mac.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2838332D17A1BFFE00C0141D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2838332C17A1BFFE00C0141D /* Foundation.framework */; };
 		2838333217A1BFFE00C0141D /* EventSource.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2838333117A1BFFE00C0141D /* EventSource.h */; };
 		2838333417A1BFFE00C0141D /* EventSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838333317A1BFFE00C0141D /* EventSource.m */; };
-		2838334017A1C02900C0141D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2838333F17A1C02900C0141D /* UIKit.framework */; };
 		2838334117A1C02900C0141D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2838332C17A1BFFE00C0141D /* Foundation.framework */; };
 		2838334317A1C02900C0141D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2838334217A1C02900C0141D /* CoreGraphics.framework */; };
 		2838334917A1C02900C0141D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2838334717A1C02900C0141D /* InfoPlist.strings */; };
@@ -25,10 +29,30 @@
 		2838335517A1C02900C0141D /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2838335417A1C02900C0141D /* Default-568h@2x.png */; };
 		2838335817A1C02900C0141D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838335717A1C02900C0141D /* ViewController.m */; };
 		2838335B17A1C02900C0141D /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2838335917A1C02900C0141D /* ViewController.xib */; };
-		2838335F17A1C03B00C0141D /* libEventSource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2838332917A1BFFE00C0141D /* libEventSource.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		281714851DD735E400F7A8E0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2838332117A1BFFD00C0141D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 28291CBF1D0B2FC500B06A27;
+			remoteInfo = "EventSource-iOS";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
+		281714871DD735E400F7A8E0 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				281714841DD735E400F7A8E0 /* EventSource.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2838332717A1BFFD00C0141D /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,6 +66,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		281714801DD7354400F7A8E0 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		28291CC01D0B2FC500B06A27 /* EventSource.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EventSource.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		28291CC21D0B2FC500B06A27 /* EventSource-iOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EventSource-iOS.h"; sourceTree = "<group>"; };
 		28291CC41D0B2FC500B06A27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -97,9 +122,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2838335F17A1C03B00C0141D /* libEventSource.a in Frameworks */,
-				2838334017A1C02900C0141D /* UIKit.framework in Frameworks */,
+				2817148A1DD736A200F7A8E0 /* UIKit.framework in Frameworks */,
 				2838334117A1C02900C0141D /* Foundation.framework in Frameworks */,
+				281714831DD735E400F7A8E0 /* EventSource.framework in Frameworks */,
 				2838334317A1C02900C0141D /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -171,6 +196,7 @@
 		2838332F17A1BFFE00C0141D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				281714801DD7354400F7A8E0 /* module.modulemap */,
 				2838333017A1BFFE00C0141D /* EventSource-Prefix.pch */,
 			);
 			name = "Supporting Files";
@@ -219,6 +245,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				281714891DD7363700F7A8E0 /* EventSource.h in Headers */,
 				28291CD21D0B30DD00B06A27 /* EventSource-Mac.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -286,10 +313,12 @@
 				2838333A17A1C02900C0141D /* Sources */,
 				2838333B17A1C02900C0141D /* Frameworks */,
 				2838333C17A1C02900C0141D /* Resources */,
+				281714871DD735E400F7A8E0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				281714861DD735E400F7A8E0 /* PBXTargetDependency */,
 			);
 			name = EventViewer;
 			productName = EventViewer;
@@ -326,9 +355,9 @@
 			projectRoot = "";
 			targets = (
 				2838332817A1BFFD00C0141D /* EventSource */,
-				2838333D17A1C02900C0141D /* EventViewer */,
 				28291CBF1D0B2FC500B06A27 /* EventSource-iOS */,
 				28291CCE1D0B30DD00B06A27 /* EventSource-Mac */,
+				2838333D17A1C02900C0141D /* EventViewer */,
 			);
 		};
 /* End PBXProject section */
@@ -375,6 +404,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				281714881DD7362E00F7A8E0 /* EventSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,6 +427,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		281714861DD735E400F7A8E0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 28291CBF1D0B2FC500B06A27 /* EventSource-iOS */;
+			targetProxy = 281714851DD735E400F7A8E0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		2838334717A1C02900C0141D /* InfoPlist.strings */ = {
@@ -445,6 +483,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "$(SRCROOT)/EventSource/module.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = co.cwbrn.EventSource;
 				SKIP_INSTALL = YES;
@@ -484,6 +523,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "$(SRCROOT)/EventSource/module.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = co.cwbrn.EventSource;
 				SKIP_INSTALL = YES;
@@ -522,6 +562,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MODULEMAP_FILE = "$(SRCROOT)/EventSource/module.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = co.cwbrn.EventSource;
 				SDKROOT = macosx;
@@ -563,6 +604,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MODULEMAP_FILE = "$(SRCROOT)/EventSource/module.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = co.cwbrn.EventSource;
 				SDKROOT = macosx;
@@ -677,6 +719,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "EventViewer/EventViewer-Prefix.pch";
 				INFOPLIST_FILE = "EventViewer/EventViewer-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.neilcowburn.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -690,6 +733,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "EventViewer/EventViewer-Prefix.pch";
 				INFOPLIST_FILE = "EventViewer/EventViewer-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.neilcowburn.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";

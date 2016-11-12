@@ -23,14 +23,14 @@ static NSString *const ESEventIDKey = @"id";
 static NSString *const ESEventEventKey = @"event";
 static NSString *const ESEventRetryKey = @"retry";
 
-@interface EventSource () <NSURLConnectionDelegate, NSURLConnectionDataDelegate> {
+@interface EventSource () <NSURLSessionDataDelegate> {
     BOOL wasClosed;
     dispatch_queue_t messageQueue;
     dispatch_queue_t connectionQueue;
 }
 
 @property (nonatomic, strong) NSURL *eventURL;
-@property (nonatomic, strong) NSURLConnection *eventSource;
+@property (nonatomic, strong) NSURLSessionDataTask *eventSourceTask;
 @property (nonatomic, strong) NSMutableDictionary *listeners;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 @property (nonatomic, assign) NSTimeInterval retryInterval;
@@ -110,47 +110,30 @@ static NSString *const ESEventRetryKey = @"retry";
 - (void)close
 {
     wasClosed = YES;
-    [self.eventSource cancel];
+    [self.eventSourceTask cancel];
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
+didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler
 {
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
     if (httpResponse.statusCode == 200) {
         // Opened
         Event *e = [Event new];
         e.readyState = kEventStateOpen;
-        
 
         [self _dispatchEvent:e type:ReadyStateEvent];
         [self _dispatchEvent:e type:OpenEvent];
     }
-}
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
-    self.eventSource = nil;
-
-    if (wasClosed) {
-        return;
+    if (completionHandler) {
+        completionHandler(NSURLSessionResponseAllow);
     }
-
-    Event *e = [Event new];
-    e.readyState = kEventStateClosed;
-    e.error = error;
-
-    [self _dispatchEvent:e type:ReadyStateEvent];
-    [self _dispatchEvent:e type:ErrorEvent];
-
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_retryInterval * NSEC_PER_SEC));
-    dispatch_after(popTime, connectionQueue, ^(void){
-        [self _open];
-    });
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
 {
     NSString *eventString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSArray *lines = [eventString componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
@@ -168,7 +151,7 @@ static NSString *const ESEventRetryKey = @"retry";
                 dispatch_async(messageQueue, ^{
                     [self _dispatchEvent:event];
                 });
-                
+
                 event = [Event new];
                 event.readyState = kEventStateOpen;
             }
@@ -204,17 +187,17 @@ static NSString *const ESEventRetryKey = @"retry";
     }
 }
 
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(nullable NSError *)error
 {
-    self.eventSource = nil;
+    self.eventSourceTask = nil;
 
     if (wasClosed) {
         return;
     }
-    
+
     Event *e = [Event new];
     e.readyState = kEventStateClosed;
-    e.error = [NSError errorWithDomain:@""
+    e.error = error ?: [NSError errorWithDomain:@""
                                   code:e.readyState
                               userInfo:@{ NSLocalizedDescriptionKey: @"Connection with the event source was closed." }];
 
@@ -227,14 +210,24 @@ static NSString *const ESEventRetryKey = @"retry";
     });
 }
 
+// -------------------------------------------------------------------------------------------------------------------------------------
+
 - (void)_open
 {
     wasClosed = NO;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.eventURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:self.timeoutInterval];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.eventURL
+                                                           cachePolicy:NSURLRequestReloadIgnoringCacheData
+                                                       timeoutInterval:self.timeoutInterval];
     if (self.lastEventID) {
         [request setValue:self.lastEventID forHTTPHeaderField:@"Last-Event-ID"];
     }
-    self.eventSource = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:self
+                                                     delegateQueue:[NSOperationQueue currentQueue]];
+
+    self.eventSourceTask = [session dataTaskWithRequest:request];
+    [self.eventSourceTask resume];
 
     Event *e = [Event new];
     e.readyState = kEventStateConnecting;
