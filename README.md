@@ -71,12 +71,31 @@ http.createServer(function (req, res) {
 
 The payload above doesn't include an `id` parameter, but if you include one it will be available in the `Event` object in your Cocoa code.
 
+There is also [a simple Go Server-Sent Events server](https://github.com/neilco/EventSource/blob/master/Server/server.go). 
+
+## Installation
+
+The easiest way to get started is to use Carthage. Just add the following line to your Cartfile and the run `carthage update` from your terminal:
+
+```ruby
+github "neilco/EventSource"
+```
+
+If you prefer Cocoapods, add this to your Podfile and then run `pod install` from your terminal:
+
+```ruby
+pod 'EventSource'
+``` 
+
+Otherwise, just include the contents of the [EventSource directory](https://github.com/neilco/EventSource/tree/master/EventSource) manually to your project.
+
+## Other bits
+
 ### Contact
 
-[Neil Cowburn](http://github.com/neilco)  
-[@neilco](https://twitter.com/neilco)
+I'm [@neilco](http://github.com/neilco) on GitHub and I'm [@neilco](https://twitter.com/neilco) on Twitter.
 
-## License
+### License
 
 [MIT license](http://neil.mit-license.org)
 
