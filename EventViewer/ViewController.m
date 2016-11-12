@@ -20,8 +20,8 @@
         NSLog(@"READYSTATE: %@", event);
     }];
 
-    [source addEventListener:@"hello_event" handler:^(Event *e) {
-        NSLog(@"%@: %@", e.event, e.data);
+    [source onMessage:^(Event *event) {
+        NSLog(@"%@", event);
     }];
 }
 
