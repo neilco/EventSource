@@ -12,6 +12,9 @@
 		281714881DD7362E00F7A8E0 /* EventSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838333317A1BFFE00C0141D /* EventSource.m */; };
 		281714891DD7363700F7A8E0 /* EventSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 2838333117A1BFFE00C0141D /* EventSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2817148A1DD736A200F7A8E0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2838333F17A1C02900C0141D /* UIKit.framework */; };
+		281714941DD7436600F7A8E0 /* EventSource-watchOS.h in Headers */ = {isa = PBXBuildFile; fileRef = 281714921DD7436600F7A8E0 /* EventSource-watchOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		281714981DD7437C00F7A8E0 /* EventSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 2838333117A1BFFE00C0141D /* EventSource.h */; };
+		281714991DD7438000F7A8E0 /* EventSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838333317A1BFFE00C0141D /* EventSource.m */; };
 		28291CC31D0B2FC500B06A27 /* EventSource-iOS.h in Headers */ = {isa = PBXBuildFile; fileRef = 28291CC21D0B2FC500B06A27 /* EventSource-iOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		28291CC81D0B2FE700B06A27 /* EventSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 2838333117A1BFFE00C0141D /* EventSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		28291CC91D0B2FE700B06A27 /* EventSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838333317A1BFFE00C0141D /* EventSource.m */; };
@@ -67,6 +70,9 @@
 
 /* Begin PBXFileReference section */
 		281714801DD7354400F7A8E0 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
+		281714901DD7436600F7A8E0 /* EventSource.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EventSource.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		281714921DD7436600F7A8E0 /* EventSource-watchOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EventSource-watchOS.h"; sourceTree = "<group>"; };
+		281714931DD7436600F7A8E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		28291CC01D0B2FC500B06A27 /* EventSource.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EventSource.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		28291CC21D0B2FC500B06A27 /* EventSource-iOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EventSource-iOS.h"; sourceTree = "<group>"; };
 		28291CC41D0B2FC500B06A27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -96,6 +102,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		2817148C1DD7436600F7A8E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		28291CBC1D0B2FC500B06A27 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -132,6 +145,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		281714911DD7436600F7A8E0 /* EventSource-watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				281714921DD7436600F7A8E0 /* EventSource-watchOS.h */,
+				281714931DD7436600F7A8E0 /* Info.plist */,
+			);
+			path = "EventSource-watchOS";
+			sourceTree = "<group>";
+		};
 		28291CC11D0B2FC500B06A27 /* EventSource-iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -157,6 +179,7 @@
 				2838334417A1C02900C0141D /* EventViewer */,
 				28291CC11D0B2FC500B06A27 /* EventSource-iOS */,
 				28291CD01D0B30DD00B06A27 /* EventSource-Mac */,
+				281714911DD7436600F7A8E0 /* EventSource-watchOS */,
 				2838332B17A1BFFE00C0141D /* Frameworks */,
 				2838332A17A1BFFE00C0141D /* Products */,
 			);
@@ -169,6 +192,7 @@
 				2838333E17A1C02900C0141D /* EventViewer.app */,
 				28291CC01D0B2FC500B06A27 /* EventSource.framework */,
 				28291CCF1D0B30DD00B06A27 /* EventSource.framework */,
+				281714901DD7436600F7A8E0 /* EventSource.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -232,6 +256,15 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		2817148D1DD7436600F7A8E0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				281714981DD7437C00F7A8E0 /* EventSource.h in Headers */,
+				281714941DD7436600F7A8E0 /* EventSource-watchOS.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		28291CBD1D0B2FC500B06A27 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -253,6 +286,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		2817148F1DD7436600F7A8E0 /* EventSource-watchOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 281714951DD7436600F7A8E0 /* Build configuration list for PBXNativeTarget "EventSource-watchOS" */;
+			buildPhases = (
+				2817148B1DD7436600F7A8E0 /* Sources */,
+				2817148C1DD7436600F7A8E0 /* Frameworks */,
+				2817148D1DD7436600F7A8E0 /* Headers */,
+				2817148E1DD7436600F7A8E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "EventSource-watchOS";
+			productName = "EventSource-watchOS";
+			productReference = 281714901DD7436600F7A8E0 /* EventSource.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		28291CBF1D0B2FC500B06A27 /* EventSource-iOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 28291CC71D0B2FC500B06A27 /* Build configuration list for PBXNativeTarget "EventSource-iOS" */;
@@ -334,6 +385,11 @@
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = "Neil Cowburn";
 				TargetAttributes = {
+					2817148F1DD7436600F7A8E0 = {
+						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = 98Z69DGY5E;
+						ProvisioningStyle = Automatic;
+					};
 					28291CBF1D0B2FC500B06A27 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
@@ -357,12 +413,20 @@
 				2838332817A1BFFD00C0141D /* EventSource */,
 				28291CBF1D0B2FC500B06A27 /* EventSource-iOS */,
 				28291CCE1D0B30DD00B06A27 /* EventSource-Mac */,
+				2817148F1DD7436600F7A8E0 /* EventSource-watchOS */,
 				2838333D17A1C02900C0141D /* EventViewer */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2817148E1DD7436600F7A8E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		28291CBE1D0B2FC500B06A27 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -392,6 +456,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2817148B1DD7436600F7A8E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				281714991DD7438000F7A8E0 /* EventSource.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		28291CBB1D0B2FC500B06A27 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -456,6 +528,78 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		281714961DD7436600F7A8E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 98Z69DGY5E;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "EventSource-watchOS/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = co.cwbrn.EventSource;
+				PRODUCT_NAME = EventSource;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				WATCHOS_DEPLOYMENT_TARGET = 3.1;
+			};
+			name = Debug;
+		};
+		281714971DD7436600F7A8E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CODE_SIGN_IDENTITY = "";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 98Z69DGY5E;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "EventSource-watchOS/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = co.cwbrn.EventSource;
+				PRODUCT_NAME = EventSource;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				WATCHOS_DEPLOYMENT_TARGET = 3.1;
+			};
+			name = Release;
+		};
 		28291CC51D0B2FC500B06A27 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -744,6 +888,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		281714951DD7436600F7A8E0 /* Build configuration list for PBXNativeTarget "EventSource-watchOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				281714961DD7436600F7A8E0 /* Debug */,
+				281714971DD7436600F7A8E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		28291CC71D0B2FC500B06A27 /* Build configuration list for PBXNativeTarget "EventSource-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
