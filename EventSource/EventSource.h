@@ -56,6 +56,12 @@ typedef void (^EventSourceEventHandler)(Event *event);
 /// Returns a new instance of EventSource with the specified URL.
 ///
 /// @param URL The URL of the EventSource.
+/// @param headers the HTTP Headers used in the request
++ (instancetype)eventSourceWithURL:(NSURL *)URL HTTPHeaders:(NSDictionary<NSString*, NSString *>*) headers;
+
+/// Returns a new instance of EventSource with the specified URL.
+///
+/// @param URL The URL of the EventSource.
 /// @param timeoutInterval The request timeout interval in seconds. See <tt>NSURLRequest</tt> for more details. Default: 5 minutes.
 /// @param headers the HTTP Headers used in the request
 + (instancetype)eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval HTTPHeaders:(NSDictionary<NSString*, NSString *>*) headers;
@@ -74,9 +80,16 @@ typedef void (^EventSourceEventHandler)(Event *event);
 /// Creates a new instance of EventSource with the specified URL.
 ///
 /// @param URL The URL of the EventSource.
+/// @param headers the HTTP Headers used in the request
+- (instancetype) initWithURL:(NSURL *)URL HTTPHeaders:(NSDictionary<NSString*, NSString *>*) headers;
+
+/// Creates a new instance of EventSource with the specified URL.
+///
+/// @param URL The URL of the EventSource.
 /// @param timeoutInterval The request timeout interval in seconds. See <tt>NSURLRequest</tt> for more details. Default: 5 minutes.
 /// @param headers the HTTP Headers used in the request
 - (instancetype) initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval HTTPHeaders:(NSDictionary<NSString*, NSString *>*) headers;
+
 
 /// Registers an event handler for the Message event.
 ///

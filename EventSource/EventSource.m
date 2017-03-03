@@ -54,6 +54,11 @@ static NSString *const ESEventRetryKey = @"retry";
     return [[EventSource alloc] initWithURL:URL timeoutInterval:timeoutInterval];
 }
 
++ (instancetype) eventSourceWithURL:(NSURL *)URL HTTPHeaders:(NSDictionary<NSString *,NSString *> *)headers
+{
+    return [[EventSource alloc] initWithURL:URL HTTPHeaders:headers];
+}
+
 + (instancetype) eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval HTTPHeaders:(NSDictionary<NSString *,NSString *> *)headers
 {
     return [[EventSource alloc] initWithURL:URL timeoutInterval:timeoutInterval HTTPHeaders:headers];
@@ -67,6 +72,11 @@ static NSString *const ESEventRetryKey = @"retry";
 - (instancetype)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
 {
     return [self initWithURL:URL timeoutInterval:timeoutInterval HTTPHeaders:nil];
+}
+
+- (instancetype) initWithURL:(NSURL *)URL HTTPHeaders:(NSDictionary<NSString *,NSString *> *)headers
+{
+    return [self initWithURL:URL timeoutInterval:ES_DEFAULT_TIMEOUT HTTPHeaders:headers];
 }
 
 - (instancetype) initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval HTTPHeaders:(NSDictionary<NSString*, NSString*> *)headers
