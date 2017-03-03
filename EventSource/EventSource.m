@@ -30,6 +30,7 @@ static NSString *const ESEventRetryKey = @"retry";
 }
 
 @property (nonatomic, strong) NSURL *eventURL;
+@property (readonly, nonatomic, strong) NSDictionary <NSString *, NSString *> *HTTPRequestHeaders;
 @property (nonatomic, strong) NSURLSessionDataTask *eventSourceTask;
 @property (nonatomic, strong) NSMutableDictionary *listeners;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
@@ -53,6 +54,16 @@ static NSString *const ESEventRetryKey = @"retry";
     return [[EventSource alloc] initWithURL:URL timeoutInterval:timeoutInterval];
 }
 
++ (instancetype) eventSourceWithURL:(NSURL *)URL HTTPHeaders:(NSDictionary<NSString *,NSString *> *)headers
+{
+    return [[EventSource alloc] initWithURL:URL HTTPHeaders:headers];
+}
+
++ (instancetype) eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval HTTPHeaders:(NSDictionary<NSString *,NSString *> *)headers
+{
+    return [[EventSource alloc] initWithURL:URL timeoutInterval:timeoutInterval HTTPHeaders:headers];
+}
+
 - (instancetype)initWithURL:(NSURL *)URL
 {
     return [self initWithURL:URL timeoutInterval:ES_DEFAULT_TIMEOUT];
@@ -60,16 +71,26 @@ static NSString *const ESEventRetryKey = @"retry";
 
 - (instancetype)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval
 {
+    return [self initWithURL:URL timeoutInterval:timeoutInterval HTTPHeaders:nil];
+}
+
+- (instancetype) initWithURL:(NSURL *)URL HTTPHeaders:(NSDictionary<NSString *,NSString *> *)headers
+{
+    return [self initWithURL:URL timeoutInterval:ES_DEFAULT_TIMEOUT HTTPHeaders:headers];
+}
+
+- (instancetype) initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval HTTPHeaders:(NSDictionary<NSString*, NSString*> *)headers
+{
     self = [super init];
     if (self) {
         _listeners = [NSMutableDictionary dictionary];
         _eventURL = URL;
         _timeoutInterval = timeoutInterval;
         _retryInterval = ES_RETRY_INTERVAL;
-
+        _HTTPRequestHeaders = headers;
         messageQueue = dispatch_queue_create("co.cwbrn.eventsource-queue", DISPATCH_QUEUE_SERIAL);
         connectionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
-
+        
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_retryInterval * NSEC_PER_SEC));
         dispatch_after(popTime, connectionQueue, ^(void){
             [self _open];
@@ -218,6 +239,12 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.eventURL
                                                            cachePolicy:NSURLRequestReloadIgnoringCacheData
                                                        timeoutInterval:self.timeoutInterval];
+    if (self.HTTPRequestHeaders) {
+        for (NSString * key in self.HTTPRequestHeaders.allKeys){
+            [request setValue:self.HTTPRequestHeaders[key] forHTTPHeaderField:key];
+        }
+    }
+    
     if (self.lastEventID) {
         [request setValue:self.lastEventID forHTTPHeaderField:@"Last-Event-ID"];
     }
