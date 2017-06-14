@@ -229,6 +229,8 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
     self.eventSourceTask = [session dataTaskWithRequest:request];
     [self.eventSourceTask resume];
 
+    [session finishTasksAndInvalidate];
+    
     Event *e = [Event new];
     e.readyState = kEventStateConnecting;
 
