@@ -30,7 +30,6 @@ static NSString *const ESEventRetryKey = @"retry";
 }
 
 @property (nonatomic, strong) NSURL *eventURL;
-@property (nonatomic, strong) NSURLSessionDataTask *eventSourceTask;
 @property (nonatomic, strong) NSMutableDictionary *listeners;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 @property (nonatomic, assign) NSTimeInterval retryInterval;
@@ -109,8 +108,14 @@ static NSString *const ESEventRetryKey = @"retry";
 
 - (void)close
 {
+    //APR: To Fix Mem. Leak (2)
+    [session invalidateAndCancel];
+    //[session finishTasksAndInvalidate];
+
     wasClosed = YES;
+    
     [self.eventSourceTask cancel];
+    self.eventSourceTask=nil;
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
@@ -211,7 +216,7 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
 }
 
 // -------------------------------------------------------------------------------------------------------------------------------------
-
+NSURLSession *session;
 - (void)_open
 {
     wasClosed = NO;
@@ -228,7 +233,11 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
 
     self.eventSourceTask = [session dataTaskWithRequest:request];
     [self.eventSourceTask resume];
-
+    
+    //APR : To Fix Mem. Leak (1)
+    [session finishTasksAndInvalidate];
+    //[session invalidateAndCancel];
+    
     Event *e = [Event new];
     e.readyState = kEventStateConnecting;
 
