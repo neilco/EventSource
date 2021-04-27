@@ -204,10 +204,13 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
     [self _dispatchEvent:e type:ReadyStateEvent];
     [self _dispatchEvent:e type:ErrorEvent];
 
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_retryInterval * NSEC_PER_SEC));
-    dispatch_after(popTime, connectionQueue, ^(void){
-        [self _open];
-    });
+	__weak __typeof(self) const weakSelf = self;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_retryInterval * NSEC_PER_SEC));
+	dispatch_after(popTime, connectionQueue, ^(void){
+		__typeof(self) const strongSelf = weakSelf;
+		if(strongSelf && !strongSelf->wasClosed)
+			[strongSelf _open];
+	});
 }
 
 // -------------------------------------------------------------------------------------------------------------------------------------
@@ -228,6 +231,8 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
 
     self.eventSourceTask = [session dataTaskWithRequest:request];
     [self.eventSourceTask resume];
+	
+	[session finishTasksAndInvalidate];
 
     Event *e = [Event new];
     e.readyState = kEventStateConnecting;
