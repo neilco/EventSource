@@ -9,8 +9,8 @@
 #import "EventSource.h"
 #import <CoreGraphics/CGBase.h>
 
-static CGFloat const ES_RETRY_INTERVAL = 1.0;
-static CGFloat const ES_DEFAULT_TIMEOUT = 300.0;
+static CGFloat const ES_RETRY_INTERVAL = 40.0;
+static CGFloat const ES_DEFAULT_TIMEOUT = 600.0;
 
 static NSString *const ESKeyValueDelimiter = @":";
 static NSString *const ESEventSeparatorLFLF = @"\n\n";
