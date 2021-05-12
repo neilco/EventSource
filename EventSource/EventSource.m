@@ -70,10 +70,9 @@ static NSString *const ESEventRetryKey = @"retry";
         messageQueue = dispatch_queue_create("co.cwbrn.eventsource-queue", DISPATCH_QUEUE_SERIAL);
         connectionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
 
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_retryInterval * NSEC_PER_SEC));
-        dispatch_after(popTime, connectionQueue, ^(void){
-            [self _open];
-        });
+		dispatch_async(connectionQueue, ^{
+			[self _open];
+		});
     }
     return self;
 }
