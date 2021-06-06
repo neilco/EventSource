@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2817148F1DD7436600F7A8E0"
-               BuildableName = "EventSource-watchOS.framework"
+               BuildableName = "EventSource.framework"
                BlueprintName = "EventSource-watchOS"
                ReferencedContainer = "container:EventSource.xcodeproj">
             </BuildableReference>
@@ -29,8 +29,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -46,13 +44,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2817148F1DD7436600F7A8E0"
-            BuildableName = "EventSource-watchOS.framework"
+            BuildableName = "EventSource.framework"
             BlueprintName = "EventSource-watchOS"
             ReferencedContainer = "container:EventSource.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -64,7 +60,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2817148F1DD7436600F7A8E0"
-            BuildableName = "EventSource-watchOS.framework"
+            BuildableName = "EventSource.framework"
             BlueprintName = "EventSource-watchOS"
             ReferencedContainer = "container:EventSource.xcodeproj">
          </BuildableReference>

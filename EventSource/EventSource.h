@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 
 typedef enum {
-    kEventStateConnecting = 0,
-    kEventStateOpen = 1,
-    kEventStateClosed = 2,
+	kEventStateConnecting = 0,
+	kEventStateOpen = 1,
+	kEventStateClosed = 2,
 } EventState;
 
 // ---------------------------------------------------------------------------------------------------------------------
