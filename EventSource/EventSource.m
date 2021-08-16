@@ -54,7 +54,7 @@ static NSString *const ESEventRetryKey = @"retry";
 		_authorization = authorization;
 		_timeoutInterval = timeoutInterval;
 		_retryInterval = ES_RETRY_INTERVAL;
-						
+		
 		messageQueue = dispatch_queue_create("co.cwbrn.eventsource-queue", DISPATCH_QUEUE_SERIAL);
 		connectionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
 		
@@ -122,21 +122,25 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
 {
-	[_buffer appendString:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]];
-	
-	while(1)
+	NSString * const string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	if(string)
 	{
-		NSRange range;
-		if((range = [_buffer rangeOfString:ESEventSeparatorLFLF]).location != NSNotFound ||
-		   (range = [_buffer rangeOfString:ESEventSeparatorCRCR]).location != NSNotFound ||
-		   (range = [_buffer rangeOfString:ESEventSeparatorCRLFCRLF]).location != NSNotFound)
+		[_buffer appendString:string];
+		
+		while(1)
 		{
-			[self didReceiveString:[_buffer substringToIndex:range.location]];
-			
-			[_buffer deleteCharactersInRange:NSMakeRange(0, NSMaxRange(range))];
+			NSRange range;
+			if((range = [_buffer rangeOfString:ESEventSeparatorLFLF]).location != NSNotFound ||
+			   (range = [_buffer rangeOfString:ESEventSeparatorCRCR]).location != NSNotFound ||
+			   (range = [_buffer rangeOfString:ESEventSeparatorCRLFCRLF]).location != NSNotFound)
+			{
+				[self didReceiveString:[_buffer substringToIndex:range.location]];
+				
+				[_buffer deleteCharactersInRange:NSMakeRange(0, NSMaxRange(range))];
+			}
+			else
+				break;
 		}
-		else
-			break;
 	}
 }
 
@@ -210,7 +214,7 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
 	wasClosed = NO;
 	
 	_buffer = [NSMutableString new];
-
+	
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.eventURL
 														   cachePolicy:NSURLRequestReloadIgnoringCacheData
 													   timeoutInterval:self.timeoutInterval];
