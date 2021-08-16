@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 
 typedef enum {
-    kEventStateConnecting = 0,
-    kEventStateOpen = 1,
-    kEventStateClosed = 2,
+	kEventStateConnecting = 0,
+	kEventStateOpen = 1,
+	kEventStateClosed = 2,
 } EventState;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -42,27 +42,12 @@ typedef void (^EventSourceEventHandler)(Event *event);
 /// Connect to and receive Server-Sent Events (SSEs).
 @interface EventSource : NSObject
 
-/// Returns a new instance of EventSource with the specified URL.
-///
-/// @param URL The URL of the EventSource.
-+ (instancetype)eventSourceWithURL:(NSURL *)URL;
-
-/// Returns a new instance of EventSource with the specified URL.
-///
-/// @param URL The URL of the EventSource.
-/// @param timeoutInterval The request timeout interval in seconds. See <tt>NSURLRequest</tt> for more details. Default: 5 minutes.
-+ (instancetype)eventSourceWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval;
-
 /// Creates a new instance of EventSource with the specified URL.
 ///
 /// @param URL The URL of the EventSource.
-- (instancetype)initWithURL:(NSURL *)URL;
-
-/// Creates a new instance of EventSource with the specified URL.
-///
-/// @param URL The URL of the EventSource.
+/// @param authorization HTTP authorization header parameter.
 /// @param timeoutInterval The request timeout interval in seconds. See <tt>NSURLRequest</tt> for more details. Default: 5 minutes.
-- (instancetype)initWithURL:(NSURL *)URL timeoutInterval:(NSTimeInterval)timeoutInterval;
+- (instancetype)initWithURL:(NSURL *)URL authorization:(NSString *)authorization timeoutInterval:(NSTimeInterval)timeoutInterval;
 
 /// Registers an event handler for the Message event.
 ///
