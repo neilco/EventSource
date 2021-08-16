@@ -36,6 +36,8 @@ static NSString *const ESEventRetryKey = @"retry";
 @property (nonatomic, assign) NSTimeInterval retryInterval;
 @property (nonatomic, strong) id lastEventID;
 
+@property (nonatomic) NSMutableString *buffer;
+
 - (void)_open;
 - (void)_dispatchEvent:(Event *)e;
 
@@ -52,7 +54,7 @@ static NSString *const ESEventRetryKey = @"retry";
 		_authorization = authorization;
 		_timeoutInterval = timeoutInterval;
 		_retryInterval = ES_RETRY_INTERVAL;
-		
+						
 		messageQueue = dispatch_queue_create("co.cwbrn.eventsource-queue", DISPATCH_QUEUE_SERIAL);
 		connectionQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
 		
@@ -120,56 +122,59 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
 {
-	NSString *eventString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	NSArray *lines = [eventString componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+	[_buffer appendString:[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]];
 	
-	Event *event = [Event new];
+	while(1)
+	{
+		NSRange range;
+		if((range = [_buffer rangeOfString:ESEventSeparatorLFLF]).location != NSNotFound ||
+		   (range = [_buffer rangeOfString:ESEventSeparatorCRCR]).location != NSNotFound ||
+		   (range = [_buffer rangeOfString:ESEventSeparatorCRLFCRLF]).location != NSNotFound)
+		{
+			[self didReceiveString:[_buffer substringToIndex:range.location]];
+			
+			[_buffer deleteCharactersInRange:NSMakeRange(0, NSMaxRange(range))];
+		}
+		else
+			break;
+	}
+}
+
+- (void)didReceiveString:(NSString *)string
+{
+	Event * const event = [Event new];
 	event.readyState = kEventStateOpen;
 	
-	for (NSString *line in lines) {
-		if ([line hasPrefix:ESKeyValueDelimiter]) {
-			continue;
-		}
-		
-		if (!line || line.length == 0) {
-			if (event.data != nil) {
-				dispatch_async(messageQueue, ^{
-					[self _dispatchEvent:event];
-				});
+	for(NSString * const line in [string componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet])
+	{
+		@autoreleasepool
+		{
+			NSScanner * const scanner = [NSScanner scannerWithString:line];
+			scanner.charactersToBeSkipped = NSCharacterSet.whitespaceCharacterSet;
+			
+			NSString *key;
+			if([scanner scanUpToString:ESKeyValueDelimiter intoString:&key])
+			{
+				[scanner scanString:ESKeyValueDelimiter intoString:nil];
 				
-				event = [Event new];
-				event.readyState = kEventStateOpen;
-			}
-			continue;
-		}
-		
-		@autoreleasepool {
-			NSScanner *scanner = [NSScanner scannerWithString:line];
-			scanner.charactersToBeSkipped = [NSCharacterSet whitespaceCharacterSet];
-			
-			NSString *key, *value;
-			[scanner scanUpToString:ESKeyValueDelimiter intoString:&key];
-			[scanner scanString:ESKeyValueDelimiter intoString:nil];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet] intoString:&value];
-			
-			if (key && value) {
-				if ([key isEqualToString:ESEventEventKey]) {
-					event.event = value;
-				} else if ([key isEqualToString:ESEventDataKey]) {
-					if (event.data != nil) {
-						event.data = [event.data stringByAppendingFormat:@"\n%@", value];
-					} else {
-						event.data = value;
-					}
-				} else if ([key isEqualToString:ESEventIDKey]) {
-					event.id = value;
-					self.lastEventID = event.id;
-				} else if ([key isEqualToString:ESEventRetryKey]) {
-					self.retryInterval = [value doubleValue];
+				NSString *value;
+				if([scanner scanUpToCharactersFromSet:NSCharacterSet.newlineCharacterSet intoString:&value])
+				{
+					if([key isEqualToString:ESEventEventKey])
+						event.event = value;
+					else if([key isEqualToString:ESEventDataKey])
+						event.data = (event.data ? [event.data stringByAppendingFormat:@"\n%@", value] : value);
+					else if([key isEqualToString:ESEventIDKey])
+						_lastEventID = event.id = value;
+					else if([key isEqualToString:ESEventRetryKey])
+						_retryInterval = value.doubleValue;
 				}
 			}
 		}
 	}
+	
+	if(event.data)
+		dispatch_async(messageQueue, ^{ [self _dispatchEvent:event]; });
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(nullable NSError *)error
@@ -203,6 +208,9 @@ didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSe
 - (void)_open
 {
 	wasClosed = NO;
+	
+	_buffer = [NSMutableString new];
+
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.eventURL
 														   cachePolicy:NSURLRequestReloadIgnoringCacheData
 													   timeoutInterval:self.timeoutInterval];
